@@ -49,7 +49,7 @@ export default class FileResolver extends ExoticResolver {
     // Normalize relative paths; if anything changes, make a copy of the manifest
     const dependencies = this.normalizeDependencyPaths(manifest.dependencies, loc);
     const optionalDependencies = this.normalizeDependencyPaths(manifest.optionalDependencies, loc);
-    
+
     if (dependencies !== manifest.dependencies || optionalDependencies !== manifest.optionalDependencies) {
       const _manifest = Object.assign({}, manifest);
       if (dependencies != null) {
