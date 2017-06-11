@@ -10,12 +10,11 @@ import Lockfile from './lockfile/wrapper.js';
 import PackageReference from './package-reference.js';
 import {registries as registryResolvers} from './resolvers/index.js';
 import {MessageError} from './errors.js';
-import {entries} from './util/misc.js';
 import * as constants from './constants.js';
 import * as versionUtil from './util/version.js';
 import WorkspaceResolver from './resolvers/contextual/workspace-resolver.js';
-import * as resolvers from './resolvers/index.js';
 import * as fs from './util/fs.js';
+import {getExoticResolver} from './package-util.js';
 
 const path = require('path');
 const invariant = require('invariant');
@@ -36,16 +35,6 @@ export default class PackageRequest {
     this.foundInfo = null;
 
     resolver.usedRegistries.add(req.registry);
-  }
-
-  static getExoticResolver(pattern: string): ?Function {
-    // TODO make this type more refined
-    for (const [, Resolver] of entries(resolvers.exotics)) {
-      if (Resolver.isVersion(pattern)) {
-        return Resolver;
-      }
-    }
-    return null;
   }
 
   parentRequest: ?PackageRequest;
@@ -108,7 +97,7 @@ export default class PackageRequest {
   async findVersionOnRegistry(pattern: string): Promise<Manifest> {
     const {range, name} = await this.normalize(pattern);
 
-    const exoticResolver = PackageRequest.getExoticResolver(range);
+    const exoticResolver = getExoticResolver(range);
     if (exoticResolver) {
       let data = await this.findExoticVersionInfo(exoticResolver, range);
 
@@ -144,7 +133,7 @@ export default class PackageRequest {
   }
 
   async normalizeRange(pattern: string): Promise<string> {
-    if (pattern.includes(':') || pattern.includes('@') || PackageRequest.getExoticResolver(pattern)) {
+    if (pattern.includes(':') || pattern.includes('@') || getExoticResolver(pattern)) {
       return Promise.resolve(pattern);
     }
 
@@ -164,7 +153,6 @@ export default class PackageRequest {
   /**
    * Explode and normalize a pattern into it's name and range.
    */
-
   static normalizePattern(
     pattern: string,
   ): {
@@ -219,7 +207,7 @@ export default class PackageRequest {
    */
 
   findVersionInfo(): Promise<Manifest> {
-    const exoticResolver = PackageRequest.getExoticResolver(this.pattern);
+    const exoticResolver = getExoticResolver(this.pattern);
     if (exoticResolver) {
       return this.findExoticVersionInfo(exoticResolver, this.pattern);
     } else if (WorkspaceResolver.isWorkspace(this.pattern, this.resolver.workspaceLayout)) {
@@ -405,7 +393,7 @@ export default class PackageRequest {
 
         const normalized = PackageRequest.normalizePattern(pattern);
 
-        if (PackageRequest.getExoticResolver(pattern) || PackageRequest.getExoticResolver(normalized.range)) {
+        if (getExoticResolver(pattern) || getExoticResolver(normalized.range)) {
           latest = wanted = 'exotic';
           url = normalized.range;
         } else {

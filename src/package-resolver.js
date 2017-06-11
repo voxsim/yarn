@@ -11,6 +11,7 @@ import BlockingQueue from './util/blocking-queue.js';
 import Lockfile from './lockfile/wrapper.js';
 import map from './util/map.js';
 import WorkspaceLayout from './workspace-layout.js';
+import {getExoticResolver} from './package-util.js';
 
 const invariant = require('invariant');
 const semver = require('semver');
@@ -443,7 +444,7 @@ export default class PackageResolver {
         semver.validRange(range) &&
         semver.valid(lockfileEntry.version) &&
         !semver.satisfies(lockfileEntry.version, range) &&
-        !PackageRequest.getExoticResolver(range) &&
+        !getExoticResolver(range) &&
         hasVersion
       ) {
         this.reporter.warn(this.reporter.lang('incorrectLockfileEntry', req.pattern));

@@ -14,6 +14,7 @@ import GitResolver from '../../resolvers/exotics/git-resolver.js';
 import FileResolver from '../../resolvers/exotics/file-resolver.js';
 import PackageResolver from '../../package-resolver.js';
 import PackageRequest from '../../package-request.js';
+import {getExoticResolver} from '../../package-util.js';
 import * as fetcher from '../../package-fetcher.js';
 import PackageLinker from '../../package-linker.js';
 import * as compatibility from '../../package-compatibility.js';
@@ -127,7 +128,7 @@ class ImportResolver extends BaseResolver {
 
   resolveImport(info: Manifest): Manifest {
     const {range} = PackageRequest.normalizePattern(this.pattern);
-    const Resolver = PackageRequest.getExoticResolver(range);
+    const Resolver = getExoticResolver(range);
     if (Resolver && Resolver.prototype instanceof HostedGitResolver) {
       return this.resolveHostedGit(info, Resolver);
     } else if (Resolver && Resolver === GistResolver) {
