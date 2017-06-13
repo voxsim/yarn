@@ -4,7 +4,7 @@ import type {Reporter} from '../reporters/index.js';
 import type {Manifest} from '../types.js';
 import type {RegistryNames} from '../registries/index.js';
 import {sortAlpha} from '../util/misc.js';
-import PackageRequest from '../package-request.js';
+import {normalizePattern} from '../package-util.js';
 import parse from './parse.js';
 import * as constants from '../constants.js';
 import * as fs from '../util/fs.js';
@@ -42,7 +42,7 @@ type MinimalLockManifest = {
 };
 
 function getName(pattern: string): string {
-  return PackageRequest.normalizePattern(pattern).name;
+  return normalizePattern(pattern).name;
 }
 
 function blankObjectUndefined(obj: ?Object): ?Object {

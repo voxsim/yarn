@@ -11,7 +11,7 @@ import BlockingQueue from './util/blocking-queue.js';
 import Lockfile from './lockfile/wrapper.js';
 import map from './util/map.js';
 import WorkspaceLayout from './workspace-layout.js';
-import {getExoticResolver} from './package-util.js';
+import {getExoticResolver, normalizePattern} from './package-util.js';
 
 const invariant = require('invariant');
 const semver = require('semver');
@@ -438,7 +438,7 @@ export default class PackageResolver {
     const lockfileEntry = this.lockfile.getLocked(req.pattern);
     let fresh = false;
     if (lockfileEntry) {
-      const {range, hasVersion} = PackageRequest.normalizePattern(req.pattern);
+      const {range, hasVersion} = normalizePattern(req.pattern);
       // lockfileEntry is incorrect, remove it from lockfile cache and consider the pattern as new
       if (
         semver.validRange(range) &&

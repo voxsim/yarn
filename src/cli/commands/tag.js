@@ -2,7 +2,7 @@
 
 import type {Reporter} from '../../reporters/index.js';
 import type Config from '../../config.js';
-import PackageRequest from '../../package-request.js';
+import {normalizePattern} from '../../package-util.js';
 import buildSubCommands from './_build-sub-commands.js';
 import {getToken} from './login.js';
 import NpmRegistry from '../../registries/npm-registry.js';
@@ -36,7 +36,7 @@ export const {run, setFlags, hasWrapper, examples} = buildSubCommands(
         return false;
       }
 
-      const {name, range, hasVersion} = PackageRequest.normalizePattern(args.shift());
+      const {name, range, hasVersion} = normalizePattern(args.shift());
       if (!hasVersion) {
         throw new MessageError(reporter.lang('requiredVersionInRange'));
       }

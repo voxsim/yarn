@@ -16,8 +16,7 @@ import PackageInstallScripts from '../../package-install-scripts.js';
 import * as compatibility from '../../package-compatibility.js';
 import PackageResolver from '../../package-resolver.js';
 import PackageLinker from '../../package-linker.js';
-import PackageRequest from '../../package-request.js';
-import {getExoticResolver} from '../../package-util.js';
+import {getExoticResolver, normalizePattern} from '../../package-util.js';
 import {registries} from '../../registries/index.js';
 import {clean} from './clean.js';
 import * as constants from '../../constants.js';
@@ -215,7 +214,7 @@ export class Install {
       }
 
       // extract the name
-      const parts = PackageRequest.normalizePattern(pattern);
+      const parts = normalizePattern(pattern);
       excludeNames.push(parts.name);
     }
 

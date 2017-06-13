@@ -6,8 +6,7 @@ import type {DependencyRequestPatterns, Manifest} from '../../types.js';
 import type Config from '../../config.js';
 import type {ListOptions} from './list.js';
 import Lockfile from '../../lockfile/wrapper.js';
-import PackageRequest from '../../package-request.js';
-import {getExoticResolver} from '../../package-util.js';
+import {getExoticResolver, normalizePattern} from '../../package-util.js';
 import {buildTree} from './list.js';
 import {wrapLifecycle, Install} from './install.js';
 import {MessageError} from '../../errors.js';
@@ -55,7 +54,7 @@ export class Add extends Install {
    */
   getPatternVersion(pattern: string, pkg: Manifest): string {
     const {exact, tilde} = this.flags;
-    const parts = PackageRequest.normalizePattern(pattern);
+    const parts = normalizePattern(pattern);
     let version;
     if (getExoticResolver(pattern)) {
       // wasn't a name/range tuple so this is just a raw exotic pattern

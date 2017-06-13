@@ -14,7 +14,7 @@ import * as constants from './constants.js';
 import * as versionUtil from './util/version.js';
 import WorkspaceResolver from './resolvers/contextual/workspace-resolver.js';
 import * as fs from './util/fs.js';
-import {getExoticResolver} from './package-util.js';
+import {getExoticResolver, normalizePattern} from './package-util.js';
 
 const path = require('path');
 const invariant = require('invariant');
@@ -145,51 +145,9 @@ export default class PackageRequest {
   }
 
   async normalize(pattern: string): any {
-    const {name, range, hasVersion} = PackageRequest.normalizePattern(pattern);
+    const {name, range, hasVersion} = normalizePattern(pattern);
     const newRange = await this.normalizeRange(range);
     return {name, range: newRange, hasVersion};
-  }
-
-  /**
-   * Explode and normalize a pattern into it's name and range.
-   */
-  static normalizePattern(
-    pattern: string,
-  ): {
-    hasVersion: boolean,
-    name: string,
-    range: string,
-  } {
-    let hasVersion = false;
-    let range = 'latest';
-    let name = pattern;
-
-    // if we're a scope then remove the @ and add it back later
-    let isScoped = false;
-    if (name[0] === '@') {
-      isScoped = true;
-      name = name.slice(1);
-    }
-
-    // take first part as the name
-    const parts = name.split('@');
-    if (parts.length > 1) {
-      name = parts.shift();
-      range = parts.join('@');
-
-      if (range) {
-        hasVersion = true;
-      } else {
-        range = '*';
-      }
-    }
-
-    // add back @ scope suffix
-    if (isScoped) {
-      name = `@${name}`;
-    }
-
-    return {name, range, hasVersion};
   }
 
   /**
@@ -228,7 +186,7 @@ export default class PackageRequest {
    */
   resolveToExistingVersion(info: Manifest) {
     // get final resolved version
-    const {range, name} = PackageRequest.normalizePattern(this.pattern);
+    const {range, name} = normalizePattern(this.pattern);
     const resolved: ?Manifest = this.resolver.getHighestRangeVersionMatch(name, range);
     invariant(resolved, 'should have a resolved reference');
 
@@ -257,7 +215,7 @@ export default class PackageRequest {
 
     // check if while we were resolving this dep we've already resolved one that satisfies
     // the same range
-    const {range, name} = PackageRequest.normalizePattern(this.pattern);
+    const {range, name} = normalizePattern(this.pattern);
     const resolved: ?Manifest = frozen
       ? this.resolver.getExactVersionMatch(name, range)
       : this.resolver.getHighestRangeVersionMatch(name, range);
@@ -391,7 +349,7 @@ export default class PackageRequest {
         let wanted = '';
         let url = '';
 
-        const normalized = PackageRequest.normalizePattern(pattern);
+        const normalized = normalizePattern(pattern);
 
         if (getExoticResolver(pattern) || getExoticResolver(normalized.range)) {
           latest = wanted = 'exotic';

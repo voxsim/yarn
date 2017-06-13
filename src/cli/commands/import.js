@@ -14,7 +14,7 @@ import GitResolver from '../../resolvers/exotics/git-resolver.js';
 import FileResolver from '../../resolvers/exotics/file-resolver.js';
 import PackageResolver from '../../package-resolver.js';
 import PackageRequest from '../../package-request.js';
-import {getExoticResolver} from '../../package-util.js';
+import {getExoticResolver, normalizePattern} from '../../package-util.js';
 import * as fetcher from '../../package-fetcher.js';
 import PackageLinker from '../../package-linker.js';
 import * as compatibility from '../../package-compatibility.js';
@@ -42,7 +42,7 @@ class ImportResolver extends BaseResolver {
   }
 
   resolveHostedGit(info: Manifest, Resolver: typeof HostedGitResolver): Manifest {
-    const {range} = PackageRequest.normalizePattern(this.pattern);
+    const {range} = normalizePattern(this.pattern);
     const exploded = explodeHostedGitFragment(range, this.reporter);
     const hash = (info: any).gitHead;
     invariant(hash, 'expected package gitHead');
@@ -59,7 +59,7 @@ class ImportResolver extends BaseResolver {
   }
 
   resolveGist(info: Manifest, Resolver: typeof GistResolver): Manifest {
-    const {range} = PackageRequest.normalizePattern(this.pattern);
+    const {range} = normalizePattern(this.pattern);
     const {id} = explodeGistFragment(range, this.reporter);
     const hash = (info: any).gitHead;
     invariant(hash, 'expected package gitHead');
@@ -92,7 +92,7 @@ class ImportResolver extends BaseResolver {
   }
 
   resolveFile(info: Manifest, Resolver: typeof FileResolver): Manifest {
-    const {range} = PackageRequest.normalizePattern(this.pattern);
+    const {range} = normalizePattern(this.pattern);
     let loc = util.removePrefix(range, 'file:');
     if (!path.isAbsolute(loc)) {
       loc = path.join(this.config.cwd, loc);
@@ -127,7 +127,7 @@ class ImportResolver extends BaseResolver {
   }
 
   resolveImport(info: Manifest): Manifest {
-    const {range} = PackageRequest.normalizePattern(this.pattern);
+    const {range} = normalizePattern(this.pattern);
     const Resolver = getExoticResolver(range);
     if (Resolver && Resolver.prototype instanceof HostedGitResolver) {
       return this.resolveHostedGit(info, Resolver);
@@ -150,7 +150,7 @@ class ImportResolver extends BaseResolver {
   }
 
   async resolve(): Promise<Manifest> {
-    const {name} = PackageRequest.normalizePattern(this.pattern);
+    const {name} = normalizePattern(this.pattern);
     let cwd = this.getCwd();
     while (!path.relative(this.config.cwd, cwd).startsWith('..')) {
       const loc = path.join(cwd, 'node_modules', name);

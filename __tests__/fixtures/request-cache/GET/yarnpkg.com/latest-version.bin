@@ -1,0 +1,16 @@
+HTTP/1.1 200 OK
+Date: Tue, 13 Jun 2017 21:10:48 GMT
+Content-Type: text/plain; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Set-Cookie: __cfduid=dd59d4ac2b654d4a459a40c0c360fb9a31497388247; expires=Wed, 13-Jun-18 21:10:47 GMT; path=/; domain=.yarnpkg.com; HttpOnly
+Cache-Control: public, max-age=0, must-revalidate
+Age: 43127
+Vary: Accept-Encoding
+Server: cloudflare-nginx
+CF-RAY: 36e809e5aa5b4328-MXP
+
+6
+0.24.6
+0
+
